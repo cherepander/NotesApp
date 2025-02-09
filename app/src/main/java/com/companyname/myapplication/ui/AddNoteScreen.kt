@@ -9,7 +9,6 @@ import androidx.navigation.NavController
 import com.companyname.myapplication.data.Note
 import kotlinx.coroutines.launch
 
-// AddNoteScreen.kt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNoteScreen(
@@ -51,10 +50,10 @@ fun AddNoteScreen(
                             val newNote = Note(
                                 title = title,
                                 content = content,
-                                category = "" // Укажите категорию, если она есть
+                                category = "" //todo
                             )
                             viewModel.addNote(newNote)
-                            navController.popBackStack() // Возвращаемся на предыдущий экран
+                            navController.popBackStack()
                         }
                     },
                     modifier = Modifier.fillMaxWidth()

@@ -7,29 +7,27 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface NoteDao {
 
-    // Получение всех заметок с использованием Flow для реактивного обновления
+    // Получение всех заметок с использованием Flow
     @Query("SELECT * FROM note_table ORDER BY createdDate DESC")
     fun getAllNotes(): Flow<List<Note>>
 
-    // Вставка заметки (suspend)
+    // Вставка заметки
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(note: Note)
 
-    // Удаление заметки (suspend)
+    // Удаление заметки
     @Delete
     suspend fun delete(note: Note)
 
-
+    // Обновление заметки
     @Update
     suspend fun update(note: Note)
 
     @Update
     suspend fun updateAll(notes: List<Note>)
 
-    // Получение заметки по ID (suspend)
     @Query("SELECT * FROM note_table WHERE id = :id")
     suspend fun getNoteById(id: Int): Note?
-
 
     @Query("SELECT * FROM note_table ORDER BY createdDate DESC")
     fun getAllNotesByDate(): Flow<List<Note>>
