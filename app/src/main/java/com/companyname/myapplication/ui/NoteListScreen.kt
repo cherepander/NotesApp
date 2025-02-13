@@ -15,8 +15,12 @@ fun NoteListScreen(navController: NavController, viewModel: NoteViewModel) {
     val notes by viewModel.sortedNotes.collectAsState()
     var currentNotes by remember { mutableStateOf(notes) }
 
-    LaunchedEffect(notes) {
-        currentNotes = notes
+    LaunchedEffect(notes, searchText) {
+        currentNotes = if (searchText.text.isEmpty()) {
+            notes
+        } else {
+            notes.filter { it.title.contains(searchText.text, ignoreCase = true) }
+        }
     }
 
     Scaffold(
@@ -62,4 +66,5 @@ fun NoteListScreen(navController: NavController, viewModel: NoteViewModel) {
         }
     }
 }
+
 

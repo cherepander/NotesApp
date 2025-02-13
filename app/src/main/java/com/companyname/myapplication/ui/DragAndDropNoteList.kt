@@ -1,10 +1,15 @@
 package com.companyname.myapplication.ui
 
+import android.R.attr.fontStyle
+import android.R.id.italic
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,14 +24,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.companyname.myapplication.data.Note
 import kotlin.math.roundToInt
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun DragAndDropNoteList(
     notes: List<Note>,
@@ -54,7 +63,7 @@ fun DragAndDropNoteList(
                                 dragOffsetY = 0f
                             },
                             onDrag = { change, dragAmount ->
-                                change.consumeAllChanges()
+                                change.consume()
                                 dragOffsetY += dragAmount.y / 6
 
                                 // Порог для перестановки элементов
@@ -77,14 +86,20 @@ fun DragAndDropNoteList(
                     }
                     .padding(8.dp)
             ) {
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onEdit(note) }
                 ) {
-                    Text(text = note.title, modifier = Modifier.weight(1f))
-                    IconButton(onClick = { onDelete(note) }) {
-                        Text("Delete")
+                    Column( modifier = Modifier.weight(1f)){
+                    Text(text = note.title, modifier = Modifier.padding(bottom = 12.dp),fontSize = 25.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+
+                    Text(text = note.content, fontSize = 15.sp, maxLines = 2, overflow = TextOverflow.Ellipsis )
+                    }
+                    IconButton(onClick = { onDelete(note) },
+                    modifier = Modifier.align(Alignment.Top)  ) {
+                        Text("Del")
                     }
                 }
             }

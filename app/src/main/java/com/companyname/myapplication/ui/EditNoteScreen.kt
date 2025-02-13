@@ -1,6 +1,8 @@
 package com.companyname.myapplication.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -18,8 +20,12 @@ fun EditNoteScreen(navController: NavController, noteId: Int, viewModel: NoteVie
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
 
+    // Dropdown list state for categories
+    var expanded by remember { mutableStateOf(false) }
+    var selectedCategory by remember { mutableStateOf("Выберите категорию") }
+    val categories = listOf("Работа", "Личное", "Покупки", "Идеи")
+
     LaunchedEffect(noteId) {
-        // Загружаем заметку по ID и обновляем состояние экрана
         val loadedNote = viewModel.getNoteById(noteId)
         note = loadedNote
         title = loadedNote?.title ?: ""
@@ -49,7 +55,45 @@ fun EditNoteScreen(navController: NavController, noteId: Int, viewModel: NoteVie
                     label = { Text("Содержание") },
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 Spacer(modifier = Modifier.height(16.dp))
+
+                // Dropdown for category selection
+                Box {
+                    OutlinedTextField(
+                        value = selectedCategory,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Категория") },
+                        trailingIcon = {
+                            IconButton(onClick = { expanded = !expanded }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = "Expand dropdown"
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        categories.forEach { category ->
+                            DropdownMenuItem(
+                                text = { Text(category) },
+                                onClick = {
+                                    selectedCategory = category
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Button(
                     onClick = {
                         scope.launch {
