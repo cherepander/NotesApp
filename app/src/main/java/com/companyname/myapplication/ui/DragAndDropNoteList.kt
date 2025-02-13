@@ -1,10 +1,12 @@
 package com.companyname.myapplication.ui
 
+import android.R
 import android.R.attr.fontStyle
 import android.R.id.italic
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -17,6 +19,10 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,15 +33,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.companyname.myapplication.data.Note
 import kotlin.math.roundToInt
 
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DragAndDropNoteList(
     notes: List<Note>,
@@ -97,9 +105,8 @@ fun DragAndDropNoteList(
 
                     Text(text = note.content, fontSize = 15.sp, maxLines = 2, overflow = TextOverflow.Ellipsis )
                     }
-                    IconButton(onClick = { onDelete(note) },
-                    modifier = Modifier.align(Alignment.Top)  ) {
-                        Text("Del")
+                    IconButton(onClick = { onDelete(note) },modifier = Modifier.align(Alignment.Top)  ) {
+                       Icon(imageVector = Icons.Default.Delete, contentDescription = "delete")
                     }
                 }
             }
