@@ -9,8 +9,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.companyname.myapplication.data.Categories.*
 import com.companyname.myapplication.data.Note
 import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,17 +21,16 @@ fun EditNoteScreen(navController: NavController, noteId: Int, viewModel: NoteVie
     var note by remember { mutableStateOf<Note?>(null) }
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
-
-    // Dropdown list state for categories
     var expanded by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf("Выберите категорию") }
-    val categories = listOf("Работа", "Личное", "Покупки", "Идеи")
+    var selectedCategory by remember { mutableStateOf(OTHER) }
+    val categories = listOf(URGENTLY, JOB, IDEAS, PRIVATE, OTHER)
 
     LaunchedEffect(noteId) {
         val loadedNote = viewModel.getNoteById(noteId)
         note = loadedNote
         title = loadedNote?.title ?: ""
         content = loadedNote?.content ?: ""
+        selectedCategory = loadedNote?.category ?: OTHER
     }
 
     Scaffold(
@@ -58,10 +59,10 @@ fun EditNoteScreen(navController: NavController, noteId: Int, viewModel: NoteVie
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Dropdown for category selection
+                // Выпадаюший список категорий
                 Box {
                     OutlinedTextField(
-                        value = selectedCategory,
+                        value = selectedCategory.cname,
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Категория") },
@@ -82,7 +83,7 @@ fun EditNoteScreen(navController: NavController, noteId: Int, viewModel: NoteVie
                     ) {
                         categories.forEach { category ->
                             DropdownMenuItem(
-                                text = { Text(category) },
+                                text = { Text(category.cname) },
                                 onClick = {
                                     selectedCategory = category
                                     expanded = false
@@ -98,7 +99,7 @@ fun EditNoteScreen(navController: NavController, noteId: Int, viewModel: NoteVie
                     onClick = {
                         scope.launch {
                             note?.let {
-                                viewModel.updateNote(it.copy(title = title, content = content))
+                                viewModel.updateNote(it.copy(title = title, content = content, category = selectedCategory))
                                 navController.popBackStack()
                             }
                         }

@@ -118,7 +118,6 @@ fun DragAndDropNoteList(
                             fontSize = 15.sp,
                             overflow = TextOverflow.Ellipsis
                         )
-
                     }
                 }
             }

@@ -1,6 +1,8 @@
 package com.companyname.myapplication.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -9,6 +11,7 @@ import androidx.navigation.NavController
 import com.companyname.myapplication.data.Categories
 import com.companyname.myapplication.data.Note
 import kotlinx.coroutines.launch
+import com.companyname.myapplication.data.Categories.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -18,7 +21,10 @@ fun AddNoteScreen(
 ) {
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf(OTHER) }
+    var expanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val categories = listOf(URGENTLY, JOB, IDEAS, PRIVATE, OTHER)
 
     Scaffold(
         topBar = {
@@ -43,6 +49,40 @@ fun AddNoteScreen(
                     label = { Text("Содержание") },
                     modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                Box {
+                    OutlinedTextField(
+                        value = selectedCategory.cname,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Категория") },
+                        trailingIcon = {
+                            IconButton(onClick = { expanded = !expanded }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = "Expand dropdown"
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+
+                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        categories.forEach { category ->
+                            DropdownMenuItem(
+                                text = { Text(category.cname) },
+                                onClick = {
+                                    selectedCategory = category
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
@@ -51,7 +91,7 @@ fun AddNoteScreen(
                             val newNote = Note(
                                 title = title,
                                 content = content,
-                                category = Categories.URGENTLY //todo
+                                category = selectedCategory
                             )
                             viewModel.addNote(newNote)
                             navController.popBackStack()
