@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.companyname.myapplication.data.Categories
 import com.companyname.myapplication.data.Note
 import kotlinx.coroutines.launch
 
@@ -50,7 +51,7 @@ fun AddNoteScreen(
                             val newNote = Note(
                                 title = title,
                                 content = content,
-                                category = "" //todo
+                                category = Categories.URGENTLY //todo
                             )
                             viewModel.addNote(newNote)
                             navController.popBackStack()

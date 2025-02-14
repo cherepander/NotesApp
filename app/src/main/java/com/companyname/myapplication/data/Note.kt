@@ -8,6 +8,6 @@ data class Note(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String,
     val content: String,
-    val category: String,
+    val category: Categories,
     val createdDate: Long = System.currentTimeMillis() // дефолтное значение для даты
 )
