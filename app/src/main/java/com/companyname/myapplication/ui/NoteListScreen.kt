@@ -1,7 +1,7 @@
-// NoteListScreen.kt
 package com.companyname.myapplication.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.List
@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
-
 @Composable
 fun NoteListScreen(navController: NavController, viewModel: NoteViewModel) {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
@@ -66,17 +65,21 @@ fun NoteListScreen(navController: NavController, viewModel: NoteViewModel) {
                 )
             )
 
-            // Категории в виде чипсов
-            Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-                AssistChip(
-                    onClick = { selectedCategory = null },
-                    label = { Text("All") },
-                    colors = AssistChipDefaults.assistChipColors(
-                        containerColor = if (selectedCategory == null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+            // Категории в виде чипсов с горизонтальной прокруткой
+            LazyRow(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+                item {
+                    AssistChip(
+                        onClick = { selectedCategory = null },
+                        label = { Text("All") },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = if (selectedCategory == null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                        )
                     )
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                categories.forEach { category ->
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                // Используем items из LazyRow для отображения списка категорий
+                items(categories.size) { index ->
+                    val category = categories[index]
                     AssistChip(
                         onClick = { selectedCategory = category },
                         label = { Text(category) },
@@ -88,6 +91,7 @@ fun NoteListScreen(navController: NavController, viewModel: NoteViewModel) {
                 }
             }
 
+
             DragAndDropNoteList(
                 notes = currentNotes,
                 onReorder = { updatedNotes ->
@@ -96,6 +100,8 @@ fun NoteListScreen(navController: NavController, viewModel: NoteViewModel) {
                 },
                 onDelete = { note ->
                     viewModel.deleteNote(note)
+                    // Обновляем текущий список заметок после удаления
+                    currentNotes = currentNotes.filter { it.id != note.id }
                 },
                 onEdit = { note ->
                     navController.navigate("edit_note/${note.id}")

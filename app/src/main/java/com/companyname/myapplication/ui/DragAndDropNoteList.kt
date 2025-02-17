@@ -33,10 +33,15 @@ fun DragAndDropNoteList(
 ) {
     var draggedNoteIndex by remember { mutableStateOf(-1) }
     var dragOffsetY by remember { mutableStateOf(0f) }
-    val reorderedNotes = notes.toMutableList()
+    var localNotes by remember { mutableStateOf(notes) }
+
+    // Синхронизируем локальный список с внешним списком
+    LaunchedEffect(notes) {
+        localNotes = notes
+    }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        itemsIndexed(notes) { index, note ->
+        itemsIndexed(localNotes) { index, note ->
             val offsetY by animateDpAsState(targetValue = if (index == draggedNoteIndex) dragOffsetY.dp else 0.dp)
             val modifier = Modifier.offset(y = offsetY)
 
@@ -44,7 +49,7 @@ fun DragAndDropNoteList(
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 4.dp)
-                    .clickable { onEdit(note) }  // Открытие окна редактирования
+                    .clickable { onEdit(note) }
                     .pointerInput(Unit) {
                         detectDragGestures(
                             onDragStart = {
@@ -55,11 +60,13 @@ fun DragAndDropNoteList(
                                 change.consume()
                                 dragOffsetY += dragAmount.y / 6
                                 val deltaIndex = (dragOffsetY / 30f).roundToInt()
-                                val targetIndex = (draggedNoteIndex + deltaIndex).coerceIn(0, notes.lastIndex)
+                                val targetIndex = (draggedNoteIndex + deltaIndex).coerceIn(0, localNotes.lastIndex)
 
-                                if (targetIndex != draggedNoteIndex && draggedNoteIndex in notes.indices) {
-                                    reorderedNotes.swap(draggedNoteIndex, targetIndex)
-                                    onReorder(reorderedNotes)
+                                if (targetIndex != draggedNoteIndex && draggedNoteIndex in localNotes.indices) {
+                                    localNotes = localNotes.toMutableList().apply {
+                                        swap(draggedNoteIndex, targetIndex)
+                                    }
+                                    onReorder(localNotes)
                                     draggedNoteIndex = targetIndex
                                     dragOffsetY = 0f
                                 }
@@ -96,11 +103,11 @@ fun DragAndDropNoteList(
                             Text(
                                 text = note.category.cname,
                                 style = MaterialTheme.typography.labelSmall,
-                                color = Color.White,
+                                color = Color.Black,
                                 modifier = Modifier
                                     .background(note.category.color, shape = RoundedCornerShape(12.dp))
                                     .padding(horizontal = 8.dp, vertical = 2.dp)
-                                    .clickable { onCategoryClick(note.category.cname) }  // Фильтрация при клике на категорию
+                                    .clickable { onCategoryClick(note.category.cname) }
                             )
                         }
                     }
