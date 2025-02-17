@@ -23,6 +23,7 @@ fun AddNoteScreen(
     var content by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf(OTHER) }
     var expanded by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val categories = listOf(URGENTLY, JOB, IDEAS, PRIVATE, OTHER)
 
@@ -40,8 +41,10 @@ fun AddNoteScreen(
                     value = title,
                     onValueChange = { title = it },
                     label = { Text("Заголовок") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = errorMessage != null
                 )
+
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = content,
@@ -49,7 +52,9 @@ fun AddNoteScreen(
                     label = { Text("Содержание") },
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 Spacer(modifier = Modifier.height(8.dp))
+
                 Box {
                     OutlinedTextField(
                         value = selectedCategory.cname,
@@ -65,7 +70,6 @@ fun AddNoteScreen(
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-
                     )
                     DropdownMenu(
                         expanded = expanded,
@@ -83,18 +87,33 @@ fun AddNoteScreen(
                         }
                     }
                 }
+
                 Spacer(modifier = Modifier.height(16.dp))
+
+                // Показ сообщения об ошибке, если поля пустые
+                errorMessage?.let {
+                    Text(
+                        text = it,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+
                 Button(
                     onClick = {
-                        scope.launch {
-                            // Создаем новую заметку и добавляем её через ViewModel
-                            val newNote = Note(
-                                title = title,
-                                content = content,
-                                category = selectedCategory
-                            )
-                            viewModel.addNote(newNote)
-                            navController.popBackStack()
+                        if (title.isBlank() || content.isBlank()) {
+                            errorMessage = "Заголовок не может быть пустыми"
+                        } else {
+                            scope.launch {
+                                // Создаем новую заметку и добавляем её через ViewModel
+                                val newNote = Note(
+                                    title = title,
+                                    content = content,
+                                    category = selectedCategory
+                                )
+                                viewModel.addNote(newNote)
+                                navController.popBackStack()
+                            }
                         }
                     },
                     modifier = Modifier.fillMaxWidth()

@@ -13,7 +13,6 @@ import com.companyname.myapplication.data.Categories.*
 import com.companyname.myapplication.data.Note
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditNoteScreen(navController: NavController, noteId: Int, viewModel: NoteViewModel = viewModel()) {
@@ -23,6 +22,7 @@ fun EditNoteScreen(navController: NavController, noteId: Int, viewModel: NoteVie
     var content by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf(OTHER) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     val categories = listOf(URGENTLY, JOB, IDEAS, PRIVATE, OTHER)
 
     LaunchedEffect(noteId) {
@@ -47,7 +47,8 @@ fun EditNoteScreen(navController: NavController, noteId: Int, viewModel: NoteVie
                     value = title,
                     onValueChange = { title = it },
                     label = { Text("Заголовок") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = errorMessage != null
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
@@ -95,12 +96,25 @@ fun EditNoteScreen(navController: NavController, noteId: Int, viewModel: NoteVie
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Показываем сообщение об ошибке, если поля пустые
+                errorMessage?.let {
+                    Text(
+                        text = it,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+
                 Button(
                     onClick = {
-                        scope.launch {
-                            note?.let {
-                                viewModel.updateNote(it.copy(title = title, content = content, category = selectedCategory))
-                                navController.popBackStack()
+                        if (title.isBlank() || content.isBlank()) {
+                            errorMessage = "Заголовок не может быть пустыми"
+                        } else {
+                            scope.launch {
+                                note?.let {
+                                    viewModel.updateNote(it.copy(title = title, content = content, category = selectedCategory))
+                                    navController.popBackStack()
+                                }
                             }
                         }
                     },
